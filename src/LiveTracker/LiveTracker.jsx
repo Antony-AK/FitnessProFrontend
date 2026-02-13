@@ -12,6 +12,7 @@ import { ML_EXERCISES } from "../data/workouts";
 import { useAuth } from "../context/AuthContext"
 import axios from "axios";
 import { speak } from "../utils/speak";
+import { FITNESS_API } from "../utils/api";
 
 
 
@@ -168,7 +169,7 @@ export default function LiveTracker() {
       form.append("age", age);
 
       try {
-        const res = await fetch("http://localhost:5000/ml/analyze", {
+        const res = await fetch(`${FITNESS_API}/ml/analyze`, {
           method: "POST",
           body: form,
         });
@@ -297,7 +298,7 @@ export default function LiveTracker() {
     clearInterval(intervalRef.current);
 
 
-    await fetch("http://localhost:5000/ml/reset", {
+    await fetch(`${FITNESS_API}/ml/reset`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ exercise: activeExercise })
@@ -350,7 +351,7 @@ export default function LiveTracker() {
     setSeconds(30);
 
     // 🔄 RESET ML BACKEND
-    await fetch("http://localhost:5000/ml/reset", {
+    await fetch(`${FITNESS_API}/ml/reset`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ exercise: activeExercise })
@@ -386,7 +387,7 @@ export default function LiveTracker() {
       const token = localStorage.getItem("titan_token");
 
       await axios.post(
-        "http://localhost:5000/workouts",
+       `${FITNESS_API}/workouts`,
         {
           workoutName: workout.name,
           duration: workout.duration,
@@ -466,7 +467,7 @@ export default function LiveTracker() {
               speak(`${name} selected. Get ready.`, "en");
 
 
-              fetch("http://localhost:5000/ml/reset", {
+              fetch(`${FITNESS_API}/ml/reset`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ exercise: name })

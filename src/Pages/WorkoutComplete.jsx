@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { FITNESS_API } from "../utils/api";
 
 
 export default function WorkoutComplete() {
@@ -24,7 +25,7 @@ export default function WorkoutComplete() {
       const token = localStorage.getItem("titan_token");
 
       const res = await axios.get(
-        "http://localhost:5000/workouts/latest",
+        `${FITNESS_API}/workouts/latest`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

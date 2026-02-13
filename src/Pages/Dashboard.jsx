@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { FITNESS_API } from "../utils/api";
 
 
 
@@ -28,7 +29,7 @@ const profile = user?.profile;
       if (!token) return;
 
       const res = await axios.get(
-        "http://localhost:5000/workouts/stats",
+        `${FITNESS_API}/workouts/stats`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

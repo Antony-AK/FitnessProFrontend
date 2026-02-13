@@ -16,6 +16,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from "recharts";
+import { FITNESS_API } from "../utils/api";
 
 
 export default function Progress() {
@@ -26,7 +27,7 @@ export default function Progress() {
       const token = localStorage.getItem("titan_token");
 
       const res = await axios.get(
-        "http://localhost:5000/workouts/stats",
+       `${FITNESS_API}/workouts/stats`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }

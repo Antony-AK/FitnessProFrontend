@@ -1,9 +1,10 @@
 import axios from "axios";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { FITNESS_API } from "../utils/api";
 
 const AuthContext = createContext();
 
-const API_URL = "http://localhost:5000";
+const API_URL = FITNESS_API;
 // or your fitness backend
 
 export const AuthProvider = ({ children }) => {

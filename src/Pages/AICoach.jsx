@@ -5,6 +5,7 @@ import { speak } from "../utils/speak";
 import { useAuth } from "../context/AuthContext";
 import { Mic } from "lucide-react";
 import { useVoiceInput } from "../utils/useVoiceInput";
+import { FITNESS_API } from "../utils/api";
 
 
 
@@ -53,7 +54,7 @@ Ask me about workouts, diet, recovery, or form tips - Iâ€™ve got you covered ðŸ’
   useEffect(() => {
     if (!user?._id) return;
 
-    fetch(`http://localhost:5000/api/ai/coach/history/${user._id}`)
+    fetch(`${FITNESS_API}/api/ai/coach/history/${user._id}`)
       .then(res => res.json())
       .then(history => {
         if (Array.isArray(history) && history.length > 0) {
@@ -138,7 +139,7 @@ Ask me about workouts, diet, recovery, or form tips - Iâ€™ve got you covered ðŸ’
     setAiThinking(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/ai/coach", {
+      const res = await fetch(`${FITNESS_API}/api/ai/coach`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

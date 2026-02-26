@@ -11,6 +11,7 @@ import { useAuth } from "../context/AuthContext";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { FITNESS_API } from "../utils/api";
+import { sampleWorkouts } from "../data/workouts";
 
 
 
@@ -18,8 +19,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [stats, setStats] = useState(null);
-const profile = user?.profile;
-  
+  const profile = user?.profile;
+
 
   console.log(user);
 
@@ -56,7 +57,7 @@ const profile = user?.profile;
     Math.round((caloriesBurned / calorieGoal) * 100)
   );
 
- const calculateStreak = (workouts = []) => {
+  const calculateStreak = (workouts = []) => {
     if (workouts.length === 0) return 0;
 
     // Get unique workout dates (yyyy-mm-dd)
@@ -88,6 +89,11 @@ const profile = user?.profile;
 
     return streak;
   };
+
+  // Simple smart recommendation logic
+  const recommendedWorkout =
+    sampleWorkouts.find(w => w.difficulty === profile?.fitnessLevel) ||
+    sampleWorkouts[0];
 
   const streak = calculateStreak(stats?.workouts || []);
 
@@ -123,28 +129,24 @@ const profile = user?.profile;
 
         {/* Recommendation */}
         <div className="bg-white rounded-2xl shadow-sm p-5 flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">
-              Today's Recommendation
-            </p>
-            <h3 className="font-semibold text-lg">
-              Morning Energy Boost
-            </h3>
+          <h3 className="font-semibold text-lg">
+            {recommendedWorkout.name}
+          </h3>
 
-            <div className="flex items-center gap-4 text-sm text-gray-500 mt-2">
-              <span>⏱ 15 min</span>
-              <span>🔥 120 cal</span>
-              <span>⚡ Easy</span>
-            </div>
+          <div className="flex items-center gap-4 text-sm text-gray-500 mt-2">
+            <span>⏱ {recommendedWorkout.duration} min</span>
+            <span>🔥 {recommendedWorkout.calories} cal</span>
+            <span>⚡ {recommendedWorkout.difficulty}</span>
           </div>
 
-          {/* ▶ PLAY */}
           <button
-            onClick={() => navigate("/workouts/1")}
+            onClick={() => navigate(`/workouts/${recommendedWorkout.id}`)}
             className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white"
           >
             <Play size={18} />
           </button>
+
+
         </div>
 
         {/* Weekly Progress */}
@@ -202,10 +204,14 @@ const profile = user?.profile;
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
-            <WorkoutCard title="Morning Energy Boost" meta="15 min • Easy" onClick={() => navigate("/workouts/1")} />
-            <WorkoutCard title="Full Body Blast" meta="30 min • Medium" onClick={() => navigate("/workouts/2")} />
-            <WorkoutCard title="Upper Body Power" meta="25 min • Medium" onClick={() => navigate("/workouts/3")} />
-            <WorkoutCard title="Leg Day Challenge" meta="25 min • Hard" onClick={() => navigate("/workouts/4")} />
+            {sampleWorkouts.slice(0, 4).map((workout) => (
+              <WorkoutCard
+                key={workout.id}
+                title={workout.name}
+                meta={`${workout.duration} min • ${workout.difficulty}`}
+                onClick={() => navigate(`/workouts/${workout.id}`)}
+              />
+            ))}
           </div>
         </div>
       </div>

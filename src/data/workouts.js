@@ -1,47 +1,12 @@
 export const ML_EXERCISES = [
-  {
-    name: "Straight Posture",
-    type: "stretching",
-    difficulty: "Easy",
-    target: {
-      reps: 8,
-      note: "Stand tall with shoulders back and spine aligned to improve posture and reduce neck strain"
-    }
-  },
+
   {
     name: "Head Rotation",
     type: "stretching",
     difficulty: "Easy",
     target: {
       reps: 10,
-      note: "Slow controlled neck rotations to improve cervical mobility and reduce stiffness"
-    }
-  },
-  {
-    name: "Jumping Jacks",
-    type: "cardio",
-    difficulty: "Medium",
-    target: {
-      reps: 30,
-      note: "Full arm and leg extension to elevate heart rate and activate full body muscles"
-    }
-  },
-  {
-    name: "Push-ups",
-    type: "upper-body",
-    difficulty: "Hard",
-    target: {
-      reps: 12,
-      note: "Maintain a straight body line to build chest, shoulders and core strength"
-    }
-  },
-  {
-    name: "Pull-ups",
-    type: "upper-body",
-    difficulty: "Hard",
-    target: {
-      reps: 8,
-      note: "Engage lats and upper back while pulling up with controlled motion"
+      note: "Slow controlled neck rotations to improve cervical mobility."
     }
   },
   {
@@ -50,43 +15,25 @@ export const ML_EXERCISES = [
     difficulty: "Medium",
     target: {
       reps: 15,
-      note: "Deep squats activate glutes, quads and improve lower body stability"
+      note: "Keep chest up and go deep to activate glutes and quads."
     }
   },
   {
-    name: "Lunges",
-    type: "lower-body",
-    difficulty: "Medium",
-    target: {
-      reps: 12,
-      note: "Step forward with control to strengthen legs and improve balance"
-    }
-  },
-  {
-    name: "Bicep Curls",
-    type: "upper-body",
-    difficulty: "Easy",
-    target: {
-      reps: 15,
-      note: "Slow and controlled curls to build arm strength without straining joints"
-    }
-  },
-  {
-    name: "Leg Raise",
-    type: "core",
-    difficulty: "Medium",
-    target: {
-      reps: 12,
-      note: "Engage core muscles to lift legs and improve abdominal strength"
-    }
-  },
-  {
-    name: "Burpees",
+    name: "Jumping Jacks",
     type: "cardio",
+    difficulty: "Medium",
+    target: {
+      reps: 25,
+      note: "Full arm and leg extension to increase heart rate."
+    }
+  },
+  {
+    name: "Push-ups",
+    type: "upper-body",
     difficulty: "Hard",
     target: {
-      reps: 10,
-      note: "Explosive full-body movement to burn fat and boost cardiovascular endurance"
+      reps: 12,
+      note: "Maintain straight body line while lowering chest."
     }
   },
   {
@@ -94,26 +41,26 @@ export const ML_EXERCISES = [
     type: "core",
     difficulty: "Medium",
     target: {
-      reps: 1,
-      note: "Hold for 30–60 seconds keeping core tight and back straight"
+      reps: 30, // seconds
+      note: "Hold a straight line from head to heels. Engage your core."
     }
   },
   {
-    name: "Walking",
-    type: "cardio",
-    difficulty: "Easy",
-    target: {
-      reps: 300,
-      note: "Steady walking to improve circulation and aid active recovery"
-    }
-  },
-  {
-    name: "Calf Raises",
+    name: "Wall Sit",
     type: "lower-body",
-    difficulty: "Easy",
+    difficulty: "Medium",
     target: {
-      reps: 20,
-      note: "Lift heels slowly to strengthen calves and improve ankle stability"
+      reps: 30, // seconds
+      note: "Keep thighs parallel to floor. Back flat against the wall."
+    }
+  },
+  {
+    name: "Superman Hold",
+    type: "core",
+    difficulty: "Medium",
+    target: {
+      reps: 20, // seconds
+      note: "Lift arms and legs simultaneously. Squeeze lower back."
     }
   }
 ];
@@ -121,99 +68,72 @@ export const ML_EXERCISES = [
 
 export const categories = [
   { id: "all", label: "All" },
+  { id: "stretching", label: "🧘 Stretching" },
+  { id: "lower-body", label: "🦵 Lower Body" },
   { id: "cardio", label: "❤️ Cardio" },
   { id: "upper-body", label: "🏋️ Upper Body" },
-  { id: "lower-body", label: "🦵 Lower Body" },
-  { id: "core", label: "🧠 Core" },
-  { id: "stretching", label: "🧘 Stretching" },
+  { id: "core", label: "🔥 Core" },
 ];
 
 export const sampleWorkouts = [
   {
     id: "1",
-    name: "AI Full Body",
-    category: "all",
-    difficulty: "Medium",
-    exercises: [
-      "Jumping Jacks",
-      "Push-ups",
-      "Squats",
-      "Plank",
-      "Burpees",
-      "Lunges",
-      "Bicep Curls",
-      "Leg Raise",
-      "Calf Raises"
-    ]
-  },
-
-  {
-    id: "2",
-    name: "AI Cardio Burn",
-    category: "cardio",
-    difficulty: "Hard",
-    exercises: [
-      "Jumping Jacks",
-      "Burpees",
-      "Walking",
-      "High Knees", // Optional future
-      "Jumping Jacks"
-    ].filter(e =>
-      ["Jumping Jacks", "Burpees", "Walking"].includes(e)
-    )
-  },
-
-  {
-    id: "3",
-    name: "AI Strength Builder",
-    category: "upper-body",
-    difficulty: "Hard",
-    exercises: [
-      "Push-ups",
-      "Pull-ups",
-      "Bicep Curls",
-      "Plank",
-      "Leg Raise"
-    ]
-  },
-
-  {
-    id: "4",
-    name: "AI Leg Day",
-    category: "lower-body",
-    difficulty: "Medium",
-    exercises: [
-      "Squats",
-      "Lunges",
-      "Calf Raises",
-      "Walking",
-      "Leg Raise"
-    ]
-  },
-
-  {
-    id: "5",
-    name: "AI Core Crusher",
-    category: "core",
-    difficulty: "Medium",
-    exercises: [
-      "Plank",
-      "Leg Raise",
-      "Burpees",
-      "Squats"
-    ]
-  },
-
-  {
-    id: "6",
-    name: "AI Mobility & Recovery",
+    name: "Neck Mobility Routine",
     category: "stretching",
     difficulty: "Easy",
+    duration: 5,
+    calories: 20,
+    exercises: ["Head Rotation"]
+  },
+  {
+    id: "2",
+    name: "Lower Body Builder",
+    category: "lower-body",
+    difficulty: "Medium",
+    duration: 10,
+    calories: 80,
+    exercises: ["Squats", "Wall Sit"]
+  },
+  {
+    id: "3",
+    name: "Quick Cardio Blast",
+    category: "cardio",
+    difficulty: "Medium",
+    duration: 8,
+    calories: 100,
+    exercises: ["Jumping Jacks"]
+  },
+  {
+    id: "4",
+    name: "Upper Body Strength",
+    category: "upper-body",
+    difficulty: "Hard",
+    duration: 12,
+    calories: 120,
+    exercises: ["Push-ups"]
+  },
+  {
+    id: "5",
+    name: "Core Stability Builder",
+    category: "core",
+    difficulty: "Medium",
+    duration: 10,
+    calories: 70,
+    exercises: ["Plank", "Superman Hold"]
+  },
+  {
+    id: "6",
+    name: "AI Combo Routine",
+    category: "all",
+    difficulty: "Medium",
+    duration: 15,
+    calories: 150,
     exercises: [
-      "Straight Posture",
       "Head Rotation",
-      "Walking",
-      "Calf Raises"
+      "Squats",
+      "Jumping Jacks",
+      "Push-ups",
+      "Plank"
     ]
   }
 ];

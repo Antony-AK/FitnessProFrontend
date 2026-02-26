@@ -54,6 +54,8 @@ Ask me about workouts, diet, recovery, or form tips - Iâ€™ve got you covered ðŸ’
   useEffect(() => {
     if (!user?._id) return;
 
+    console.log("Fetching chat history for user:", user._id);
+
     fetch(`${FITNESS_API}/api/ai/coach/history/${user._id}`)
       .then(res => res.json())
       .then(history => {
@@ -139,15 +141,19 @@ Ask me about workouts, diet, recovery, or form tips - Iâ€™ve got you covered ðŸ’
     setAiThinking(true);
 
     try {
+      const token = localStorage.getItem("titan_token");
+
       const res = await fetch(`${FITNESS_API}/api/ai/coach`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({
           message: text,
           userId: user?._id,
           userProfile: user?.profile,
         })
-
       });
 
       const data = await res.json();

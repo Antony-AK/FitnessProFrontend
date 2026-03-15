@@ -20,6 +20,8 @@ export default function WorkoutComplete() {
 
   const [workout, setWorkout] = useState(null);
 
+  const HOLD_EXERCISES = ["Plank", "Wall Sit", "Superman Hold"];
+
   useEffect(() => {
     const fetchWorkout = async () => {
       const token = localStorage.getItem("titan_token");
@@ -49,8 +51,22 @@ export default function WorkoutComplete() {
   const calories = exercises.reduce((s, e) => s + e.calories, 0);
 
   const improvements = exercises
-    .filter(e => e.reps < e.target)
-    .map(e => `Increase ${e.name} reps to ${e.target}`);
+    .map(e => {
+      const isHold = HOLD_EXERCISES.includes(e.name);
+
+      if (isHold) {
+        if (e.reps < e.target) {
+          return `Hold ${e.name} longer (target ${e.target} seconds)`;
+        }
+      } else {
+        if (e.reps < e.target) {
+          return `Increase ${e.name} reps to ${e.target}`;
+        }
+      }
+
+      return null;
+    })
+    .filter(Boolean);
   const coachNote =
     improvements.length === 0
       ? "Amazing! You hit all your AI targets 💪"

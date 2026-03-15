@@ -114,9 +114,7 @@ export default function LiveTracker() {
     });
 
     return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach(track => track.stop());
-      }
+      shutdownCameraSystem();
       clearInterval(intervalRef.current);
     };
   }, []);
@@ -149,31 +147,31 @@ export default function LiveTracker() {
 
 
 
+  // useEffect(() => {
+  //   if (!isRunning || paused || !activeExercise) return;
+
+  //   if (HOLD_EXERCISES.includes(activeExercise)) {
+
+  //     intervalRef.current = setInterval(sendFrame, 200);
+  //   }
+
+  //   return () => clearInterval(intervalRef.current);
+  // }, [isRunning, paused, activeExercise]);
+
+
   useEffect(() => {
     if (!isRunning || paused || !activeExercise) return;
 
-    if (HOLD_EXERCISES.includes(activeExercise)) {
+    if (cameraRef.current) {
 
-      intervalRef.current = setInterval(sendFrame, 200);
-    }
+      repStageRef.current = null;
+      lastRepTimestampRef.current = 0;
 
-    return () => clearInterval(intervalRef.current);
-  }, [isRunning, paused, activeExercise]);
-
-
-  useEffect(() => {
-    if (!isRunning || paused || !activeExercise) return;
-
-    const needsCamera =
-      activeExercise === "Head Rotation" ||
-      !HOLD_EXERCISES.includes(activeExercise);
-
-    if (needsCamera && cameraRef.current) {
       cameraRef.current.start().catch(() => { });
     }
 
     return () => {
-      if (needsCamera && cameraRef.current) {
+      if (cameraRef.current) {
         cameraRef.current.stop();
       }
     };
@@ -250,16 +248,13 @@ export default function LiveTracker() {
       ctx.fill();
     };
 
-    const drawLine = (a, b) => {
+    const drawLine = (a, b, correct = true) => {
       ctx.beginPath();
       ctx.moveTo(a.x * canvas.width, a.y * canvas.height);
       ctx.lineTo(b.x * canvas.width, b.y * canvas.height);
-      ctx.strokeStyle =
-        accuracyRef.current > 85
-          ? "#00ff88"
-          : accuracyRef.current > 70
-            ? "#ffaa00"
-            : "#ff4444"; ctx.lineWidth = 2;
+
+      ctx.strokeStyle = correct ? "#00ff88" : "#ff4444"; // green vs red
+      ctx.lineWidth = 3;
       ctx.stroke();
     };
 
@@ -487,15 +482,144 @@ export default function LiveTracker() {
       }
     }
 
-    // ================= IDLE DETECTION =================
-    const idleTime = now - lastMovementTimeRef.current;
+    if (activeExercise === "Plank") {
 
-    if (
-      idleTime > 4000 &&
-      now - lastCoachSpeakRef.current > 6000
-    ) {
-      speak("You are being idle. Please continue the exercise.", "en");
-      lastCoachSpeakRef.current = now;
+      const shoulder = safe(12);
+      const hip = safe(24);
+      const ankle = safe(28);
+
+      if (!shoulder || !hip || !ankle) return;
+
+      const angle = calculateAngle(shoulder, hip, ankle);
+
+      const correct = angle > 160;
+
+      // skeleton feedback
+      drawLine(shoulder, hip, correct);
+      drawLine(hip, ankle, correct);
+
+      if (correct) {
+
+        const elapsed =
+          (Date.now() - exerciseStartTimeRef.current) / 1000;
+
+        setData(prev => ({
+          ...prev,
+          holdTime: Math.floor(elapsed),
+          calories: (elapsed * 0.12).toFixed(2),
+          accuracy: 95
+        }));
+
+        accuracyRef.current = 95;
+
+      } else {
+
+        accuracyRef.current = 60;
+
+        if (now - lastPostureSpeakRef.current > 4000) {
+          speak("Keep your body straight. Do not drop your hips.", "en");
+          lastPostureSpeakRef.current = now;
+        }
+
+      }
+    }
+
+    if (activeExercise === "Wall Sit") {
+
+      const hip = safe(24);
+      const knee = safe(26);
+      const ankle = safe(28);
+
+      if (!hip || !knee || !ankle) return;
+
+      const angle = calculateAngle(hip, knee, ankle);
+
+      const correct = angle > 85 && angle < 110;
+
+      drawLine(hip, knee, correct);
+      drawLine(knee, ankle, correct);
+
+      if (correct) {
+
+        const elapsed =
+          (Date.now() - exerciseStartTimeRef.current) / 1000;
+
+        setData(prev => ({
+          ...prev,
+          holdTime: Math.floor(elapsed),
+          calories: (elapsed * 0.15).toFixed(2),
+          accuracy: 92
+        }));
+
+        accuracyRef.current = 92;
+
+      } else {
+
+        accuracyRef.current = 60;
+
+        if (now - lastPostureSpeakRef.current > 4000) {
+          speak("Lower your hips until your knees reach ninety degrees.", "en");
+          lastPostureSpeakRef.current = now;
+        }
+
+      }
+    }
+
+    if (activeExercise === "Superman Hold") {
+
+      const wrist = safe(15);
+      const shoulder = safe(11);
+      const ankle = safe(27);
+      const hip = safe(24);
+
+      if (!wrist || !shoulder || !ankle || !hip) return;
+
+      const armsUp = wrist.y < shoulder.y;
+      const legsUp = ankle.y < hip.y;
+
+      const correct = armsUp && legsUp;
+
+      drawLine(shoulder, hip, correct);
+      drawLine(hip, ankle, correct);
+
+      if (correct) {
+
+        const elapsed =
+          (Date.now() - exerciseStartTimeRef.current) / 1000;
+
+        setData(prev => ({
+          ...prev,
+          holdTime: Math.floor(elapsed),
+          calories: (elapsed * 0.13).toFixed(2),
+          accuracy: 93
+        }));
+
+        accuracyRef.current = 93;
+
+      } else {
+
+        accuracyRef.current = 60;
+
+        if (now - lastPostureSpeakRef.current > 4000) {
+          speak("Lift your arms and legs higher. Engage your lower back.", "en");
+          lastPostureSpeakRef.current = now;
+        }
+
+      }
+    }
+
+    if (!HOLD_EXERCISES.includes(activeExercise)) {
+
+      const idleTime = now - lastMovementTimeRef.current;
+
+      if (
+        idleTime > 4000 &&
+        now - lastCoachSpeakRef.current > 6000
+      ) {
+        speak("You are being idle. Please continue the exercise.", "en");
+        lastCoachSpeakRef.current = now;
+      }
+
     }
 
   }, [activeExercise, isRunning, paused]);
@@ -583,19 +707,6 @@ export default function LiveTracker() {
     "Wall Sit",
     "Superman Hold"
   ];
-
-  const sendFrame = async () => {
-    if (!activeExercise) return;
-
-
-    // Hold exercises only
-    if (HOLD_EXERCISES.includes(activeExercise)) {
-      handleSimulatedWorkout();
-      return;
-    }
-
-    // Pose exercises do nothing here
-  };
 
 
   const handleHeadRotationML = async () => {
@@ -795,40 +906,42 @@ export default function LiveTracker() {
   };
 
   const finishExercise = async () => {
-    if (finishLock.current) return;   // 🚫 hard lock
-    finishLock.current = true;   // � lock during finish
-    if (cameraRef.current) {
-      cameraRef.current.stop();
+  if (finishLock.current) return;
+  finishLock.current = true;
+
+  if (cameraRef.current) {
+    cameraRef.current.stop();
+  }
+
+  setExerciseDone(true);
+  setIsRunning(false);
+
+  clearInterval(intervalRef.current);
+
+  await fetch(`${FITNESS_API}/ml/reset`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ exercise: activeExercise })
+  });
+
+  const final = lastMetricsRef.current || {};
+
+  setExerciseResults(prev => [
+    ...prev,
+    {
+      name: activeExercise,
+      reps: final.reps || 0,
+      target: targetReps,
+      calories: final.calories || 0,
+      hr: final.heart_rate || 0,
+      fatigue: final.fatigue || 0,
+      stress: final.stress || 0
     }
-    setExerciseDone(true);
-    setIsRunning(false);
-    clearInterval(intervalRef.current);
+  ]);
 
+  const accuracy = final.accuracy || 0;
 
-    await fetch(`${FITNESS_API}/ml/reset`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ exercise: activeExercise })
-    });
-
-    const final = lastMetricsRef.current || {};
-
-    setExerciseResults(prev => [
-      ...prev,
-      {
-        name: activeExercise,
-        reps: final.reps || 0,
-        target: targetReps,
-        calories: final.calories || 0,
-        hr: final.heart_rate || 0,
-        fatigue: final.fatigue || 0,
-        stress: final.stress || 0
-      }
-    ]);
-
-    const accuracy = final.accuracy || 0;
-
-    if (accuracy >= 90) {
+  if (accuracy >= 90) {
       speak("Excellent form. You nailed it.", "en");
     } else if (accuracy >= 70) {
       speak("Good effort. Try to improve your posture.", "en");
@@ -836,10 +949,10 @@ export default function LiveTracker() {
       speak("Focus on your form. Slow down and maintain structure.", "en");
     }
 
+  console.log("🏁 Finished:", activeExercise);
+};
 
-    console.log("🏁 Finished:", activeExercise, data);
-
-  };
+  
 
   const repeatExercise = async () => {
     if (!activeExercise) return;
@@ -895,26 +1008,30 @@ export default function LiveTracker() {
     if (cameraRef.current) {
       try {
         cameraRef.current.stop();
-      } catch (e) {
-        console.log("Camera already stopped");
-      }
+      } catch (e) { }
     }
 
-    // Stop pose processing
+    // Stop pose processor
     if (poseRef.current) {
       try {
         poseRef.current.close();
-      } catch (e) {
-        console.log("Pose already closed");
-      }
+      } catch (e) { }
     }
 
-    // Stop interval loop
+    // Stop ML intervals
     clearInterval(intervalRef.current);
 
-    // Stop raw video stream tracks
+    // 🔴 STOP actual webcam stream
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = videoRef.current.srcObject.getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+
+    // Also stop saved stream
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
     }
 
     setIsRunning(false);
@@ -968,10 +1085,9 @@ export default function LiveTracker() {
             const ok = window.confirm(
               "Workout not completed. Progress will not be saved. Exit?"
             );
+
             if (ok) {
-              if (streamRef.current) {
-                streamRef.current.getTracks().forEach(track => track.stop());
-              }
+              shutdownCameraSystem();
               navigate("/workouts");
             }
           }}
@@ -989,20 +1105,25 @@ export default function LiveTracker() {
           <button
             key={name}
             onClick={() => {
+
+              console.log("Switching exercise →", name);
+
+              // 🔴 Stop camera
               if (cameraRef.current) {
-                cameraRef.current.stop();
-                cameraRef.current.started = false;
+                try {
+                  cameraRef.current.stop();
+                } catch { }
               }
-              const index = workout.exercises.indexOf(name);
-              setCurrentIndex(index);
-              setActiveExercise(name);
-              setSeconds(30);
-              setIsRunning(false);
-              setExerciseDone(false);
+
+              // 🔴 Stop ML loop
+              clearInterval(intervalRef.current);
+
+              // 🔴 Reset ML refs
               repStageRef.current = null;
+              lastRepTimestampRef.current = 0;
+              lastMetricsRef.current = null;
+
               accuracyRef.current = 100;
-              setAccuracyScore(100);
-              finishLock.current = false;   // 🔓 unlock for next exercise
 
               lastSpokenRepRef.current = 0;
               exerciseSpokenRef.current = false;
@@ -1010,20 +1131,34 @@ export default function LiveTracker() {
               lastMovementTimeRef.current = Date.now();
               lastIdleSpeakRef.current = 0;
               lastWrongSpeakRef.current = 0;
-              lastSpokenRepRef.current = 0;
-              exerciseStartTimeRef.current = Date.now();
               lastPostureSpeakRef.current = 0;
               lastFatigueSpeakRef.current = 0;
+              lastCoachSpeakRef.current = 0;
 
+              // 🔴 Reset timer
+              exerciseStartTimeRef.current = Date.now();
+
+              // 🔴 Reset UI state
+              setData(null);
+              setSeconds(30);
+              setIsRunning(false);
+              setPaused(false);
+              setExerciseDone(false);
+
+              // 🔴 Change exercise
+              const index = workout.exercises.indexOf(name);
+              setCurrentIndex(index);
+              setActiveExercise(name);
 
               speak(`${name} selected. Get ready.`, "en");
 
-
+              // 🔴 Reset backend ML state
               fetch(`${FITNESS_API}/ml/reset`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ exercise: name })
               });
+
             }}
 
             className={`px-3 py-1 rounded-full text-xs border
@@ -1083,7 +1218,11 @@ export default function LiveTracker() {
 
             {!HOLD_EXERCISES.includes(activeExercise) && (
               <Metric label="Reps" value={data.reps} />
-            )}            <Metric label="Calories" value={`${data.calories} kcal`} />
+            )}
+            {HOLD_EXERCISES.includes(activeExercise) && (
+              <Metric label="Hold Time" value={`${data?.holdTime || 0}s`} />
+            )}
+            <Metric label="Calories" value={`${data.calories} kcal`} />
             <Metric label="HR" value={`${data.heart_rate} bpm`} />
 
             <Metric label="Breath" value={`${data.breath_rate} bpm`} />
@@ -1138,8 +1277,8 @@ export default function LiveTracker() {
         </p>
 
 
-        {/* TIMER */}
-        {!isRunning ? (
+        {/* BEFORE START */}
+        {!isRunning && !exerciseDone && (
           <button
             disabled={!activeExercise}
             onClick={() => {
@@ -1155,7 +1294,9 @@ export default function LiveTracker() {
                 stress: 30,
                 intensity: "Low"
               });
+
               console.log("▶ START:", activeExercise);
+
               setIsRunning(true);
               setPaused(false);
               setExerciseDone(false);
@@ -1164,23 +1305,34 @@ export default function LiveTracker() {
               lastMovementTimeRef.current = Date.now();
 
               speak("Start now. Maintain proper posture.", "en");
-
             }}
             className={`w-96 py-3 rounded-xl flex justify-center items-center mx-auto mt-4
     ${activeExercise ? "bg-purple-600 text-white" : "bg-gray-300 text-gray-500"}
-  `}
+    `}
           >
             ▶ Start {activeExercise || "Select an exercise"}
           </button>
+        )}
 
-
-        ) : (
+        {/* RUNNING */}
+        {isRunning && (
           <div className="text-center">
             <p className="text-5xl font-bold text-purple-600">{seconds}</p>
             <p className="text-sm text-gray-500">seconds</p>
           </div>
         )}
 
+        {/* FINISHED */}
+        {!isRunning && exerciseDone && (
+          <div className="text-center">
+            <p className="text-xl font-semibold text-green-600">
+              Exercise Completed ✅
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Select Finish Workout to continue
+            </p>
+          </div>
+        )}
 
 
 
@@ -1210,13 +1362,7 @@ export default function LiveTracker() {
               <Pause />
             </button>
           ) : (
-            <button
-              onClick={repeatExercise}
-              disabled={!activeExercise}
-              className="w-14 h-14 border border-purple-400 text-purple-600 rounded-full flex items-center justify-center hover:bg-purple-50"
-            >
-              🔁
-            </button>
+            <></>
           )}
 
           {/* Finish Workout */}

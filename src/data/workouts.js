@@ -78,62 +78,65 @@ export const categories = [
 export const sampleWorkouts = [
   {
     id: "1",
-    name: "Neck Mobility Routine",
+    name: "Neck Mobility Flow",
     category: "stretching",
     difficulty: "Easy",
-    duration: 5,
-    calories: 20,
+    duration: 3,
+    calories: 10,
     exercises: ["Head Rotation"]
   },
   {
     id: "2",
-    name: "Lower Body Builder",
+    name: "Power Squat Builder",
     category: "lower-body",
     difficulty: "Medium",
-    duration: 10,
-    calories: 80,
-    exercises: ["Squats", "Wall Sit"]
+    duration: 6,
+    calories: 45,
+    exercises: ["Squats"]
   },
   {
     id: "3",
-    name: "Quick Cardio Blast",
+    name: "Jumping Jack Cardio Burn",
     category: "cardio",
     difficulty: "Medium",
-    duration: 8,
-    calories: 100,
+    duration: 5,
+    calories: 50,
     exercises: ["Jumping Jacks"]
   },
   {
     id: "4",
-    name: "Upper Body Strength",
+    name: "Push-Up Strength Challenge",
     category: "upper-body",
     difficulty: "Hard",
-    duration: 12,
-    calories: 120,
+    duration: 6,
+    calories: 55,
     exercises: ["Push-ups"]
   },
   {
     id: "5",
-    name: "Core Stability Builder",
+    name: "Core Stability Plank Hold",
     category: "core",
     difficulty: "Medium",
-    duration: 10,
-    calories: 70,
-    exercises: ["Plank", "Superman Hold"]
+    duration: 5,
+    calories: 35,
+    exercises: ["Plank"]
   },
   {
     id: "6",
-    name: "AI Combo Routine",
-    category: "all",
+    name: "Wall Sit Endurance Builder",
+    category: "lower-body",
     difficulty: "Medium",
-    duration: 15,
-    calories: 150,
-    exercises: [
-      "Head Rotation",
-      "Squats",
-      "Jumping Jacks",
-      "Push-ups",
-      "Plank"
-    ]
+    duration: 5,
+    calories: 40,
+    exercises: ["Wall Sit"]
+  },
+  {
+    id: "7",
+    name: "Superman Core Activation",
+    category: "core",
+    difficulty: "Medium",
+    duration: 4,
+    calories: 30,
+    exercises: ["Superman Hold"]
   }
 ];
